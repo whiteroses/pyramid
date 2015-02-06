@@ -25,9 +25,15 @@ init_mimetypes(mimetypes)
 
 _BLOCK_SIZE = 4096 * 64 # 256K
 
+class _MarkerString(str):
+    def __new__(cls, val):
+        return str.__new__(cls, val)
+
+_DEFAULT_CONTENT_TYPE = _MarkerString(_Response.default_content_type)
+
 @implementer(IResponse)
 class Response(_Response):
-    pass
+    default_content_type = _DEFAULT_CONTENT_TYPE
 
 class FileResponse(Response):
     """

@@ -162,7 +162,7 @@ def string_renderer_factory(info):
         if request is not None:
             response = request.response
             ct = response.content_type
-            if ct == response.default_content_type:
+            if ct is response.default_content_type:
                 response.content_type = 'text/plain'
         return value
     return _render
@@ -260,7 +260,7 @@ class JSON(object):
             if request is not None:
                 response = request.response
                 ct = response.content_type
-                if ct == response.default_content_type:
+                if ct is response.default_content_type:
                     response.content_type = 'application/json'
             default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
@@ -366,7 +366,7 @@ class JSONP(JSON):
                     ct = 'application/javascript'
                     body = '%s(%s);' % (callback, val)
                 response = request.response
-                if response.content_type == response.default_content_type:
+                if response.content_type is response.default_content_type:
                     response.content_type = ct
             return body
         return _render

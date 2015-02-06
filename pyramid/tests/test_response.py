@@ -19,6 +19,12 @@ class TestResponse(unittest.TestCase):
         inst = self._getTargetClass()()
         self.assertTrue(IResponse.providedBy(inst))
 
+    def test_default_content_type(self):
+        from webob.response import Response
+        r = self._getTargetClass()
+        self.assertEqual(r.default_content_type, Response.default_content_type)
+        self.assertFalse(r.default_content_type is Response.default_content_type)
+
 class TestFileResponse(unittest.TestCase):
     def _makeOne(self, file, **kw):
         from pyramid.response import FileResponse
