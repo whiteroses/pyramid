@@ -713,6 +713,224 @@ class AcceptContentTypeTest(unittest.TestCase):
         res = self.testapp.get('/hello', headers={'Accept': 'text/*'}, status=200)
         self.assertEqual(res.content_type, 'text/plain')
 
+class AddViewAcceptArgMediaRangeAllTest(unittest.TestCase):
+    def setUp(self):
+        def view(request):
+            return 'text/plain'
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('root', '/')
+        config.add_view(
+            view, route_name='root', accept='*/*', renderer='string',
+        )
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def test_no_header(self):
+        res = self.testapp.get('/', headers={}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all(self):
+        res = self.testapp.get('/', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all_subtypes_of_type(self):
+        res = self.testapp.get('/', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_specific_media_type(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_specific_media_type_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain;q=0, */*'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_type_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_all_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': '*/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+class AddViewAcceptArgMediaRangeAllSubtypesOfTypeTest(unittest.TestCase):
+    def setUp(self):
+        def view(request):
+            return 'text/plain'
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('root', '/')
+        config.add_view(
+            view, route_name='root', accept='text/*', renderer='string',
+        )
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def test_no_header(self):
+        res = self.testapp.get('/', headers={}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all(self):
+        res = self.testapp.get('/', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all_subtypes_of_type(self):
+        res = self.testapp.get('/', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_specific_media_type(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_none_acceptable(self):
+        self.testapp.get('/', headers={'Accept': 'application/*'}, status=404)
+
+    def test_header_ruled_out_by_specific_media_type_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain;q=0, */*'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_type_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_all_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': '*/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+class AddRouteAcceptArgMediaRangeAllTest(unittest.TestCase):
+    def setUp(self):
+        def view(request):
+            return 'text/plain'
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('root', '/', accept='*/*')
+        config.add_view(view, route_name='root', renderer='string')
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def test_no_header(self):
+        res = self.testapp.get('/', headers={}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all(self):
+        res = self.testapp.get('/', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all_subtypes_of_type(self):
+        res = self.testapp.get('/', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_specific_media_type(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_specific_media_type_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain;q=0, */*'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_type_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_all_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': '*/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+class AddRouteAcceptArgMediaRangeAllSubtypesOfTypeTest(unittest.TestCase):
+    def setUp(self):
+        def view(request):
+            return 'text/plain'
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('root', '/', accept='text/*')
+        config.add_view(view, route_name='root', renderer='string')
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def test_no_header(self):
+        res = self.testapp.get('/', headers={}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all(self):
+        res = self.testapp.get('/', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_all_subtypes_of_type(self):
+        res = self.testapp.get('/', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_specific_media_type(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_none_acceptable(self):
+        self.testapp.get('/', headers={'Accept': 'application/*'}, status=404)
+
+    def test_header_ruled_out_by_specific_media_type_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/plain;q=0, */*'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_type_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': 'text/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
+    def test_header_ruled_out_by_all_range_q0(self):
+        res = self.testapp.get(
+            '/', headers={'Accept': '*/*;q=0, text/html'}, status=200,
+        )
+        self.assertEqual(res.content_type, 'text/plain')
+
 
 class DummyContext(object):
     pass
