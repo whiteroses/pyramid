@@ -140,15 +140,9 @@ class MultiView(object):
 
     def get_views(self, request):
         if self.accepts and hasattr(request, 'accept'):
-            accepts = self.accepts[:]
             views = []
-            while accepts:
-                match = request.accept.best_match(accepts)
-                if match is None:
-                    break
-                subset = self.media_views[match]
-                views.extend(subset)
-                accepts.remove(match)
+            for offer, _ in request.accept.acceptable_offers(self.accepts):
+                views.extend(self.media_views[offer])
             views.extend(self.views)
             return views
         return self.views

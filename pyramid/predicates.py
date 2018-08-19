@@ -139,7 +139,7 @@ class AcceptPredicate(object):
     phash = text
 
     def __call__(self, context, request):
-        return self.val in request.accept
+        return bool(request.accept.acceptable_offers([self.val]))
 
 class ContainmentPredicate(object):
     def __init__(self, val, config):
